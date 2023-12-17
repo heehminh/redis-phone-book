@@ -63,3 +63,35 @@ function updateUserTable(updatedUser) {
     }
   }
 }
+
+function deleteFirstValue() {
+  // 서버와 통신하여 맨 처음 값 삭제를 요청하는 코드 작성
+  fetch("/deleteFirstValue", {
+    method: "POST",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // 삭제가 성공적으로 이루어진 경우, 필요한 동작 수행
+      console.log("맨 처음 값 삭제 완료");
+    })
+    .catch((error) => {
+      // 삭제 요청이 실패한 경우, 에러 처리
+      console.error("맨 처음 값 삭제 실패:", error);
+    });
+}
+
+function deleteLastValue() {
+  // 서버와 통신하여 맨 마지막 값 삭제를 요청하는 코드 작성
+  fetch("/deleteLastValue", {
+    method: "POST",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // 삭제가 성공적으로 이루어진 경우, 필요한 동작 수행
+      console.log("맨 마지막 값 삭제 완료");
+    })
+    .catch((error) => {
+      // 삭제 요청이 실패한 경우, 에러 처리
+      console.error("맨 마지막 값 삭제 실패:", error);
+    });
+}

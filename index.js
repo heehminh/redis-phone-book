@@ -146,3 +146,51 @@ app.get("/count", async (req, res) => {
     res.status(500).send(`Server Error 500: ${error.message}`);
   }
 });
+
+app.post("/deleteFirstValue", (req, res) => {
+  redisClient.lpop("users", (error, value) => {
+    if (error) {
+      console.error("Redis LPOP error:", error);
+      res.status(500).json({ message: "맨 처음 값 삭제 실패" });
+    } else {
+      console.log("Value popped from left:", value);
+      res.json({ message: "맨 처음 값 삭제 완료" });
+    }
+  });
+});
+
+app.post("/deleteLastValue", (req, res) => {
+  redisClient.rpop("users", (error, value) => {
+    if (error) {
+      console.error("Redis RPOP error:", error);
+      res.status(500).json({ message: "맨 마지막 값 삭제 실패" });
+    } else {
+      console.log("Value popped from right:", value);
+      res.json({ message: "맨 마지막 값 삭제 완료" });
+    }
+  });
+});
+
+// 생일 범위 검색
+app.get("/search", (req, res) => {
+  const startDate = req.query["start-date"];
+  const endDate = req.query["end-date"];
+  console.log(`startDate: ${startDate}, endDate: ${endDate}`);
+
+  redisClient.lrange("users", 0, -1, (error, users) => {
+    if (error) {
+      console.error("Redis LRANGE 에러:", error);
+      return res.status(500).json({ error: "검색 중 에러가 발생했습니다." });
+    }
+
+    const filteredUsers = users
+      .map((user) => JSON.parse(user))
+      .filter((user) => user.birth >= startDate && user.birth <= endDate);
+
+    if (filteredUsers.length === 0) {
+      return res.json({ message: "해당 기간 내에 사용자가 없습니다." });
+    }
+    res.render("search", { startDate, endDate, filteredUsers });
+    console.log(filteredUsers);
+  });
+});

@@ -1,0 +1,3 @@
+Server running on Port 3000
+조회된 키: [ 'users' ]
+MongoDB connected
