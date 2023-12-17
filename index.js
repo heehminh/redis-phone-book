@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 // express 서버를 구성합니다.
 const app = express();
 
+app.use(express.static("views"));
+
 const UserSchema = new mongoose.Schema({
   name: String,
   phoneNumber: String,
@@ -101,7 +103,6 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
-// Update a user (HINCRBY)
 app.put("/users/:id", async (req, res) => {
   try {
     const userId = req.params.id;
