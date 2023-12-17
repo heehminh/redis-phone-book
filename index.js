@@ -77,15 +77,41 @@ app.set("view engine", "ejs");
 // Read all users
 app.get("/users", async (req, res) => {
   try {
-    const users = await UserModel.find({});
-    res.render("users", { users });
+    redisClient.lrange("users", 0, -1, async (error, redisData) => {
+      if (error) {
+        console.error("Redis lrange error:", error);
+        res.status(500).send(`Server Error 500: ${error.message}`);
+        return;
+      }
+
+      const users = redisData.map((data) => JSON.parse(data));
+      res.render("users", { users: users });
+    });
   } catch (error) {
-    console.error("MongoDB find error:", error);
+    console.error("Error:", error);
     res.status(500).send(`Server Error 500: ${error.message}`);
   }
 });
 
-// Read (HMGET)
+app.get("/getUsers", async (req, res) => {
+  try {
+    redisClient.lrange("users", 0, -1, async (error, redisData) => {
+      if (error) {
+        console.error("Redis lrange error:", error);
+        res.status(500).send(`Server Error 500: ${error.message}`);
+        return;
+      }
+
+      const users = redisData.map((data) => JSON.parse(data));
+
+      res.json({ users: users });
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send(`Server Error 500: ${error.message}`);
+  }
+});
+
 app.get("/users/:id", async (req, res) => {
   try {
     const userId = req.params.id; // 숫자를 문자열로 변환
@@ -167,6 +193,18 @@ app.post("/deleteLastValue", (req, res) => {
     } else {
       console.log("Value popped from right:", value);
       res.json({ message: "맨 마지막 값 삭제 완료" });
+    }
+  });
+});
+
+app.post("/deleteAllValues", (req, res) => {
+  redisClient.del("users", (error, count) => {
+    if (error) {
+      console.error("Redis DEL error:", error);
+      res.status(500).json({ message: "데이터 삭제 실패" });
+    } else {
+      console.log("Deleted", count, "values from Redis");
+      res.json({ message: "데이터 삭제 완료" });
     }
   });
 });

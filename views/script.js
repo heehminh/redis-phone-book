@@ -71,8 +71,10 @@ function deleteFirstValue() {
   })
     .then((response) => response.json())
     .then((data) => {
-      // 삭제가 성공적으로 이루어진 경우, 필요한 동작 수행
       console.log("맨 처음 값 삭제 완료");
+      // 업데이트된 사용자 데이터를 서버에서 응답으로 받아와 테이블 업데이트
+      // 데이터 갱신 및 화면 업데이트
+      updateUserTable(data);
     })
     .catch((error) => {
       // 삭제 요청이 실패한 경우, 에러 처리
@@ -87,11 +89,30 @@ function deleteLastValue() {
   })
     .then((response) => response.json())
     .then((data) => {
-      // 삭제가 성공적으로 이루어진 경우, 필요한 동작 수행
-      console.log("맨 마지막 값 삭제 완료");
+      console.log("맨 처음 값 삭제 완료");
+      // 업데이트된 사용자 데이터를 서버에서 응답으로 받아와 테이블 업데이트
+      // 데이터 갱신 및 화면 업데이트
+      updateUserTable(data);
     })
     .catch((error) => {
       // 삭제 요청이 실패한 경우, 에러 처리
       console.error("맨 마지막 값 삭제 실패:", error);
+    });
+}
+
+function deleteAllValues() {
+  fetch("/deleteAllValues", {
+    method: "POST",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("모든 값 삭제 완료");
+      // 업데이트된 사용자 데이터를 서버에서 응답으로 받아와 테이블 업데이트
+      // 데이터 갱신 및 화면 업데이트
+      updateUserTable(data);
+    })
+    .catch((error) => {
+      // 삭제 요청이 실패한 경우, 에러 처리
+      console.error("모든 값 삭제 실패:", error);
     });
 }
