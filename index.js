@@ -35,7 +35,6 @@ app.use(bodyParser.json());
 })();
 
 app.get("/", (req, res) => {
-  // res.send("Hello World! 안녕하세요!");
   res.sendFile(__dirname + "/index.html");
 });
 
@@ -48,7 +47,7 @@ app.listen(port, () => console.log(`Server running on Port ${port}`));
 // Create (LPUSH)
 app.post("/users", async (req, res) => {
   try {
-    const { id, name, phoneNumber, birth, address } = req.body;
+    const { name, phoneNumber, birth, address } = req.body;
     const newUser = new UserModel({
       name,
       phoneNumber,
@@ -125,68 +124,24 @@ app.put("/users/:id", async (req, res) => {
   }
 });
 
-// // DELETE /users/:id 요청 처리
-// app.delete("/users/:id", async (req, res) => {
-//   const id = req.params.id;
+// List 길이 확인
+app.get("/count", async (req, res) => {
+  try {
+    const listLength = await new Promise((resolve, reject) => {
+      redisClient.llen("users", (error, length) => {
+        if (error) {
+          console.error("Redis LLEN error:", error);
+          reject(error);
+        } else {
+          console.log("List length:", length);
+          resolve(length);
+        }
+      });
+    });
 
-//   // id를 사용하여 해당 항목 삭제
-//   await UserModel.findByIdAndDelete(id, (err, deletedItem) => {
-//     if (err) {
-//       console.error("삭제 실패:", err);
-//       res.status(500).send("삭제 실패");
-//     } else {
-//       console.log("삭제 성공:", deletedItem);
-//       res.send("삭제 성공");
-//     }
-//   });
-// });
-
-// // Delete
-// app.delete("/users/:id", (req, res) => {
-//   const userId = req.params.id;
-
-//   UserModel.findByIdAndDelete(userId, (error, deletedUser) => {
-//     if (error) {
-//       console.error("MongoDB delete error:", error);
-//       res.status(500).send(`Server Error 500: ${error.message}`);
-//     } else if (deletedUser) {
-//       redisClient.lrem("users", 0, JSON.stringify(deletedUser), (error) => {
-//         if (error) {
-//           console.error("Redis LREM error:", error);
-//         }
-//         res.send(deletedUser);
-//       });
-//     } else {
-//       res.status(404).send("User not found 404");
-//     }
-//   });
-// });
-
-// // HyperLogLog (원소의 개수)
-// app.get("/users/count", (req, res) => {
-//   redisClient.pfcount("users", (error, count) => {
-//     if (error) {
-//       console.error("Redis PFCount error:", error);
-//       res.status(500).send(`Server Error 500: ${error.message}`);
-//     } else {
-//       res.send({ count });
-//     }
-//   });
-// });
-
-// // Expire
-// app.post("/users/:id/expire", (req, res) => {
-//   const userId = req.params.id;
-//   const expireTime = req.body.expireTime;
-
-//   redisClient.expire(userId, expireTime, (error, result) => {
-//     if (error) {
-//       console.error("Redis EXPIRE error:", error);
-//       res.status(500).send(`Server Error 500: ${error.message}`);
-//     } else if (result === 1) {
-//       res.send("Key expired");
-//     } else {
-//       res.status(404).send("Key not found");
-//     }
-//   });
-// });
+    res.render("count", { listLength });
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).send(`Server Error 500: ${error.message}`);
+  }
+});

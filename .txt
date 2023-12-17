@@ -1,10 +1,3 @@
-
-CRUD 구현 
-(C) LPUSH, RPUSH - list에 추가 
-(R) HMGET / hincrby(아토믹)
-hyperloglogs - 원소의 개수 
-
-주소록
-이름, 전화번호, 생년월일, 주소
-
-Expire
+LPUSH, RPUSH
+LPOP, RPOP
+LLEN
